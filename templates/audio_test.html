@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .audio-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .audio-player {
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Audio Functionality Test</h1>
+        
+        <div class="audio-section">
+            <h2>Test 1: Direct Audio Element</h2>
+            <p>Testing direct HTML5 audio playback with a sample file:</p>
+            <audio id="direct-audio" controls>
+                <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+            <button onclick="document.getElementById('direct-audio').play()">Play Sample Audio</button>
+            <div id="direct-status"></div>
+        </div>
+        
+        <div class="audio-section">
+            <h2>Test 2: Dynamic Audio Creation</h2>
+            <p>Testing dynamically creating an audio element with JavaScript:</p>
+            <div id="dynamic-audio-container"></div>
+            <button id="create-audio-btn">Create & Play Audio</button>
+            <div id="dynamic-status"></div>
+        </div>
+        
+        <div class="audio-section">
+            <h2>Test 3: TTS Test</h2>
+            <p>Testing text-to-speech audio generation from server:</p>
+            <button id="generate-tts-btn">Generate TTS Audio</button>
+            <div id="tts-audio-container"></div>
+            <div id="tts-status"></div>
+        </div>
+        
+        <div class="audio-section">
+            <h2>Back to Main Application</h2>
+            <a href="/">Return to Interactive Audio Quest</a>
+        </div>
+    </div>
+    
+    <script>
+        // Test 1: Track direct audio element events
+        const directAudio = document.getElementById('direct-audio');
+        const directStatus = document.getElementById('direct-status');
+        
+        directAudio.addEventListener('play', () => {
+            directStatus.innerHTML = '<div class="status success">Audio is playing</div>';
+        });
+        
+        directAudio.addEventListener('error', (e) => {
+            directStatus.innerHTML = `<div class="status error">Error loading audio: ${e.target.error.message || 'Unknown error'}</div>`;
+        });
+        
+        // Test 2: Dynamic audio creation
+        const createAudioBtn = document.getElementById('create-audio-btn');
+        const dynamicContainer = document.getElementById('dynamic-audio-container');
+        const dynamicStatus = document.getElementById('dynamic-status');
+        
+        createAudioBtn.addEventListener('click', () => {
+            dynamicContainer.innerHTML = ''; // Clear previous
+            dynamicStatus.innerHTML = '<div class="status">Creating audio element...</div>';
+            
+            const audioElement = document.createElement('audio');
+            audioElement.controls = true;
+            audioElement.className = 'audio-player';
+            
+            const source = document.createElement('source');
+            source.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3';
+            source.type = 'audio/mpeg';
+            
+            audioElement.appendChild(source);
+            
+            audioElement.addEventListener('canplaythrough', () => {
+                dynamicStatus.innerHTML = '<div class="status success">Audio loaded successfully</div>';
+                audioElement.play();
+            });
+            
+            audioElement.addEventListener('error', (e) => {
+                dynamicStatus.innerHTML = `<div class="status error">Error loading audio: ${e.target.error.message || 'Unknown error'}</div>`;
+            });
+            
+            dynamicContainer.appendChild(audioElement);
+        });
+        
+        // Test 3: TTS API test
+        const generateTtsBtn = document.getElementById('generate-tts-btn');
+        const ttsContainer = document.getElementById('tts-audio-container');
+        const ttsStatus = document.getElementById('tts-status');
+        
+        generateTtsBtn.addEventListener('click', () => {
+            ttsContainer.innerHTML = '';
+            ttsStatus.innerHTML = '<div class="status">Generating TTS audio...</div>';
+            
+            fetch('/test_audio')
+                .then(response => response.json())
+                .then(data => {
+                    ttsStatus.innerHTML = `<div class="status success">${data.message}</div>`;
+                    
+                    if (data.audio_url) {
+                        const audioElement = document.createElement('audio');
+                        audioElement.controls = true;
+                        audioElement.className = 'audio-player';
+                        
+                        const source = document.createElement('source');
+                        source.src = data.audio_url;
+                        source.type = 'audio/mpeg';
+                        
+                        audioElement.appendChild(source);
+                        
+                        audioElement.addEventListener('canplaythrough', () => {
+                            ttsStatus.innerHTML += '<div class="status success">TTS audio loaded successfully</div>';
+                        });
+                        
+                        audioElement.addEventListener('error', (e) => {
+                            ttsStatus.innerHTML += `<div class="status error">Error loading TTS audio: ${e.target.error.message || 'Unknown error'}</div>`;
+                        });
+                        
+                        ttsContainer.appendChild(audioElement);
+                    }
+                })
+                .catch(error => {
+                    ttsStatus.innerHTML = `<div class="status error">Error calling TTS API: ${error.message}</div>`;
+                });
+        });
+    </script>
+</body>
+</html>

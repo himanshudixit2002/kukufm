@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Audio Quest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --accent-color: #ec4899;
+            --background-color: #0f172a;
+            --text-color: #f8fafc;
+            --card-bg: #1e293b;
+            --button-bg: #4f46e5;
+            --button-hover: #4338ca;
+            --border-radius: 16px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--background-color), #1e1b4b);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-attachment: fixed;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 80px rgba(99, 102, 241, 0.1);
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            max-width: 120px;
+            height: auto;
+        }
+        
+        .intro-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            padding: 20px 0;
+        }
+        
+        .intro-screen h2 {
+            font-size: 2.5rem;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .intro-screen p {
+            font-size: 1.2rem;
+            max-width: 80%;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .start-btn {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 16px 36px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 20px;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(99, 102, 241, 0.4);
+        }
+        
+        .start-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .story-card {
+            margin-bottom: 30px;
+            position: relative;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .scene-title {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            color: var(--primary-color);
+            text-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .scene-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            border-radius: 3px;
+        }
+        
+        .narrative {
+            margin-bottom: 30px;
+            font-size: 1.15rem;
+            line-height: 1.8;
+            background: rgba(15, 23, 42, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-color);
+            text-align: left;
+        }
+        
+        .ambience {
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+            background: rgba(15, 23, 42, 0.2);
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        
+        .audio-controls {
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .audio-btn {
+            background-color: rgba(99, 102, 241, 0.2);
+            color: var(--text-color);
+            border: 1px solid var(--primary-color);
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .audio-btn::before {
+            content: '▶';
+            font-size: 0.8rem;
+        }
+        
+        .audio-btn:hover {
+            background-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 90%;
+            margin: 0 auto;
+        }
+        
+        .choice-btn {
+            background: linear-gradient(to right, var(--button-bg), rgba(79, 70, 229, 0.8));
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: left;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .choice-btn::after {
+            content: '→';
+            position: absolute;
+            right: 20px;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .choice-btn:hover {
+            background: linear-gradient(to right, var(--button-hover), rgba(67, 56, 202, 0.8));
+            transform: translateX(5px);
+            padding-right: 40px;
+        }
+        
+        .choice-btn:hover::after {
+            opacity: 1;
+            right: 15px;
+        }
+        
+        .waiting {
+            text-align: center;
+            font-size: 1.2rem;
+            padding: 60px 40px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .restart-btn {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 16px 36px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: block;
+            margin: 30px auto 0;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .restart-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .restart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(99, 102, 241, 0.4);
+        }
+        
+        .restart-btn:hover::before {
+            left: 100%;
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+        .story-end {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(236, 72, 153, 0.3);
+        }
+        
+        .story-end h3 {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .story-end p {
+            margin-bottom: 20px;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px 15px;
+            }
+            
+            .scene-title {
+                font-size: 1.6rem;
+            }
+            
+            .narrative {
+                font-size: 1rem;
+                padding: 15px;
+            }
+            
+            .choice-btn {
+                font-size: 0.95rem;
+                padding: 14px 20px;
+            }
+            
+            .intro-screen h2 {
+                font-size: 2rem;
+            }
+            
+            .logo {
+                position: relative;
+                top: 0;
+                left: 0;
+                margin-bottom: 20px;
+                max-width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="intro-screen" class="intro-screen">
+            <h2>Welcome to the Whispering Forest</h2>
+            <p>An adventure where your choices shape the story</p>
+            <p>Explore an ancient forest filled with secrets and magic</p>
+            
+            <!-- Test audio player -->
+            <div class="audio-controls">
+                <p>Introduction Narration:</p>
+                <audio controls class="audio-player">
+                    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            
+            <button id="start-btn" class="start-btn">Begin Your Journey</button>
+        </div>
+        
+        <div id="story-container" class="hidden">
+            <div id="loading" class="waiting">
+                <div class="loading"></div>
+                <p>Loading your adventure...</p>
+            </div>
+            
+            <div id="story-card" class="story-card hidden">
+                <h2 id="scene-title" class="scene-title">Scene Title</h2>
+                
+                <div class="audio-controls">
+                    <button id="play-btn" class="audio-btn">Play Narration</button>
+                    <!-- Direct audio element -->
+                    <audio id="scene-audio" controls class="audio-player">
+                        <source id="scene-audio-source" src="" type="audio/mp3">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+                
+                <p id="narrative" class="narrative">Narrative text will appear here...</p>
+                <p id="ambience" class="ambience">Ambient sounds description...</p>
+                
+                <div id="choices" class="choices">
+                    <!-- Choice buttons will be added here -->
+                </div>
+
+                <!-- Story End Message -->
+                <div id="story-end" class="story-end hidden">
+                    <h3>Your Journey Has Reached an End</h3>
+                    <p>This path of your adventure has concluded. Would you like to start a new journey?</p>
+                </div>
+            </div>
+            
+            <button id="restart-btn" class="restart-btn hidden">Start New Adventure</button>
+        </div>
+        
+        <!-- User Information Footer -->
+        <div class="footer">
+            <div class="user-info">
+                <span>Name: Himanshu Dixit</span>
+                <span>Reg No: 21BDS0212</span>
+                <span>Phone: 7390922922</span>
+            </div>
+            <p>© 2023 KUKUFM Interactive Audio Quest</p>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const introScreen = document.getElementById('intro-screen');
+            const startBtn = document.getElementById('start-btn');
+            const storyContainer = document.getElementById('story-container');
+            const loadingIndicator = document.getElementById('loading');
+            const storyCard = document.getElementById('story-card');
+            const sceneTitle = document.getElementById('scene-title');
+            const narrative = document.getElementById('narrative');
+            const ambience = document.getElementById('ambience');
+            const choicesContainer = document.getElementById('choices');
+            const playBtn = document.getElementById('play-btn');
+            const restartBtn = document.getElementById('restart-btn');
+            const storyEnd = document.getElementById('story-end');
+            const sceneAudio = document.getElementById('scene-audio');
+            const sceneAudioSource = document.getElementById('scene-audio-source');
+            
+            // State
+            let userId = null;
+            let currentScene = null;
+            let backgroundAudio = new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
+            backgroundAudio.loop = true;
+            backgroundAudio.volume = 0.1; // Set background audio volume to 10%
+            backgroundAudio.play();
+
+            // Start the adventure
+            startBtn.addEventListener('click', function() {
+                introScreen.classList.add('hidden');
+                storyContainer.classList.remove('hidden');
+                startStory();
+            });
+            
+            // Play narration audio
+            playBtn.addEventListener('click', function() {
+                playSceneAudio();
+            });
+            
+            // Function to play scene audio
+            function playSceneAudio() {
+                // Stop any currently playing audio
+                if (sceneAudio.paused === false) {
+                    sceneAudio.pause();
+                    sceneAudio.currentTime = 0; // Reset to start
+                }
+                
+                // Set the new audio source
+                if (currentScene && currentScene.audio && currentScene.audio.narrative) {
+                    sceneAudioSource.src = currentScene.audio.narrative;
+                    sceneAudio.volume = 0.8; // Set narration volume to 80%
+                    sceneAudio.load();
+                    sceneAudio.play()
+                        .then(() => {
+                            playBtn.textContent = 'Playing...';
+                            sceneAudio.onended = function() {
+                                playBtn.textContent = 'Play Narration';
+                            };
+                        })
+                        .catch(error => {
+                            console.error("Audio playback failed:", error);
+                            playBtn.textContent = 'Audio Error';
+                        });
+                }
+            }
+            
+            // Restart button
+            restartBtn.addEventListener('click', function() {
+                storyCard.classList.add('hidden');
+                loadingIndicator.classList.remove('hidden');
+                storyEnd.classList.add('hidden');
+                startStory();
+            });
+            
+            // Start a new story
+            function startStory() {
+                fetch('/start_story?use_sample=true')
+                    .then(response => response.json())
+                    .then(data => {
+                        userId = data.user_id;
+                        updateScene(data.scene);
+                        loadingIndicator.classList.add('hidden');
+                        storyCard.classList.remove('hidden');
+                    })
+                    .catch(error => {
+                        console.error('Error starting story:', error);
+                        loadingIndicator.innerHTML = '<p>Error loading story. Please try again.</p>';
+                    });
+            }
+            
+            // Make a choice
+            function makeChoice(choiceId) {
+                loadingIndicator.classList.remove('hidden');
+                storyCard.classList.add('hidden');
+                
+                fetch('/next_scene', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        scene_id: currentScene.scene_id,
+                        choice_id: choiceId,
+                        use_sample: true
+                    }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                            // This means we've reached the end of the story branch
+                            throw new Error('Story path ended');
+                        }
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    updateScene(data.scene);
+                    loadingIndicator.classList.add('hidden');
+                    storyCard.classList.remove('hidden');
+                })
+                .catch(error => {
+                    console.error('Error making choice:', error);
+                    // Show end of story UI instead of error
+                    showStoryEnd();
+                });
+            }
+            
+            // Show story end screen
+            function showStoryEnd() {
+                loadingIndicator.classList.add('hidden');
+                storyCard.classList.remove('hidden');
+                storyEnd.classList.remove('hidden');
+                choicesContainer.innerHTML = '';
+                restartBtn.classList.remove('hidden');
+            }
+            
+            // Update the scene display
+            function updateScene(scene) {
+                currentScene = scene;
+                
+                // Update scene details
+                sceneTitle.textContent = scene.title;
+                narrative.textContent = scene.narrative;
+                
+                if (scene.ambience) {
+                    ambience.textContent = scene.ambience;
+                    ambience.classList.remove('hidden');
+                } else {
+                    ambience.classList.add('hidden');
+                }
+                
+                // Update audio source
+                if (scene.audio && scene.audio.narrative) {
+                    sceneAudioSource.src = scene.audio.narrative;
+                    sceneAudio.volume = 0.8; // Set narration volume to 80%
+                    sceneAudio.load();
+                } else {
+                    sceneAudioSource.src = "";
+                }
+                
+                // Clear previous choices
+                choicesContainer.innerHTML = '';
+                
+                // Hide the story end message initially
+                storyEnd.classList.add('hidden');
+                
+                // Add new choices
+                if (scene.choices && scene.choices.length > 0) {
+                    scene.choices.forEach(choice => {
+                        const button = document.createElement('button');
+                        button.className = 'choice-btn';
+                        button.textContent = choice.text;
+                        button.addEventListener('click', function() {
+                            makeChoice(choice.id);
+                        });
+                        choicesContainer.appendChild(button);
+                    });
+                    
+                    restartBtn.classList.add('hidden');
+                } else {
+                    // End of story branch
+                    storyEnd.classList.remove('hidden');
+                    restartBtn.classList.remove('hidden');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

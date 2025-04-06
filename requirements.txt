@@ -1,0 +1,8 @@
+Flask
+google-generativeai
+firebase-admin
+pyttsx3
+SpeechRecognition
+gtts
+requests
+python-dotenv
