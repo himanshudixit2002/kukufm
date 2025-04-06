@@ -95,7 +95,3 @@ interactive_audio_quest/
 ## Offline Mode
 
 If Firebase is not configured, the application automatically operates in offline mode, storing data in local JSON files under an `offline_data` directory.
-
-## License
-
-[MIT License](LICENSE)
